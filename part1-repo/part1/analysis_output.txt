@@ -1,0 +1,242 @@
+
+================================================================================
+TASK 1: Load dataset
+================================================================================
+First 5 rows:
+   order_id           order_date customer_segment   region product_category  customer_age  quantity unit_price  \
+0    100921  2024-06-02 12:00:00        Corporate    North      Electronics          18.0       2.0    $107.72   
+1    100418  2024-03-10 16:00:00         Consumer    North      Electronics           NaN       1.0    $284.38   
+2    100115  2024-01-20 04:00:00      Home Office  Central      Electronics          26.0       3.0    $161.60   
+3    101378  2024-08-17 16:00:00        Corporate     East      Electronics          21.0       3.0    $181.28   
+4    100167  2024-01-28 20:00:00        Corporate    South        Furniture          29.0       1.0    $498.63   
+
+   discount_pct  revenue  rating  delivery_days  shipping_cost  
+0         0.295   151.89     NaN            2.0           9.37  
+1         0.104   254.80     NaN            1.0           9.93  
+2         0.328   325.79     5.0            4.0           4.74  
+3         0.111   483.47     4.7            4.0            NaN  
+4         0.059   469.21     4.2            3.0            NaN  
+
+Column dtypes:
+order_id              int64
+order_date              str
+customer_segment        str
+region                  str
+product_category        str
+customer_age        float64
+quantity            float64
+unit_price              str
+discount_pct        float64
+revenue             float64
+rating              float64
+delivery_days       float64
+shipping_cost       float64
+dtype: object
+
+Shape: (2040, 13)
+
+================================================================================
+TASK 2: Null value analysis
+================================================================================
+                  null_count  null_pct
+shipping_cost            594     29.12
+rating                   185      9.07
+customer_age             108      5.29
+delivery_days             96      4.71
+revenue                   89      4.36
+unit_price                20      0.98
+product_category           0      0.00
+customer_segment           0      0.00
+order_date                 0      0.00
+order_id                   0      0.00
+region                     0      0.00
+discount_pct               0      0.00
+quantity                   0      0.00
+
+Columns exceeding 20% null rate: ['shipping_cost']
+Numeric columns below 20% nulls to be median-filled: ['customer_age', 'revenue', 'rating', 'delivery_days']
+
+Nulls remaining after median-fill of low-null numeric columns:
+order_id              0
+order_date            0
+customer_segment      0
+region                0
+product_category      0
+customer_age          0
+quantity              0
+unit_price           20
+discount_pct          0
+revenue               0
+rating                0
+delivery_days         0
+shipping_cost       594
+dtype: int64
+
+================================================================================
+TASK 3: Duplicate detection and removal
+================================================================================
+Duplicate rows found: 40
+Rows removed: 40
+New shape: (2000, 13)
+
+Null % before dedup vs after dedup:
+                  before  after
+order_id           0.000    0.0
+order_date         0.000    0.0
+customer_segment   0.000    0.0
+region             0.000    0.0
+product_category   0.000    0.0
+customer_age       0.000    0.0
+quantity           0.000    0.0
+unit_price         0.980    1.0
+discount_pct       0.000    0.0
+revenue            0.000    0.0
+rating             0.000    0.0
+delivery_days      0.000    0.0
+shipping_cost     29.118   29.1
+
+================================================================================
+TASK 4: Data type correction
+================================================================================
+Memory usage BEFORE conversion (bytes): 734807
+unit_price null % after coercion: 1.00%
+Memory usage AFTER conversion (bytes): 302684
+Memory reduction: 432123 bytes (58.81%)
+
+Updated dtypes:
+order_id               int64
+order_date               str
+customer_segment    category
+region              category
+product_category    category
+customer_age         float64
+quantity             float64
+unit_price           float64
+discount_pct         float64
+revenue              float64
+rating               float64
+delivery_days        float64
+shipping_cost        float64
+dtype: object
+
+================================================================================
+TASK 5: Descriptive statistics and skewness
+================================================================================
+       customer_age     quantity   unit_price  discount_pct       revenue       rating  delivery_days  shipping_cost
+count   2000.000000  2000.000000  2000.000000   2000.000000   2000.000000  2000.000000    2000.000000    1418.000000
+mean      45.630500     3.137000   169.470900      0.195450    420.596191     4.160900       4.193500      11.017920
+std       15.933704     2.974164   194.782263      0.120636    738.603673     0.713075       2.385981       7.068132
+min       18.000000     1.000000     2.580000      0.004000      2.290000     1.600000       1.000000       1.000000
+25%       32.000000     2.000000    23.087500      0.103000     52.665000     3.700000       3.000000       6.182500
+50%       46.000000     3.000000   101.985000      0.174000    166.310000     4.300000       4.000000       9.205000
+75%       58.000000     4.000000   254.740000      0.267000    523.610000     4.800000       5.000000      13.847500
+max       74.000000    47.000000  1887.730000      0.761000  15810.393928     5.000000      27.000000      35.040000
+
+Skewness (sorted by |skew|):
+quantity         10.024930
+revenue           8.038459
+delivery_days     4.277672
+unit_price        2.008904
+shipping_cost     0.920759
+discount_pct      0.875601
+rating           -0.760430
+customer_age      0.040826
+dtype: float64
+
+Most skewed column: quantity (skew=10.025)
+Second most skewed column: revenue (skew=8.038)
+
+================================================================================
+TASK 6: Outlier detection with IQR
+================================================================================
+revenue: Q1=52.66, Q3=523.61, IQR=470.94, bounds=[-653.75, 1230.03], outliers=149
+quantity: Q1=2.00, Q3=4.00, IQR=2.00, bounds=[-1.00, 7.00], outliers=10
+delivery_days: Q1=3.00, Q3=5.00, IQR=2.00, bounds=[0.00, 8.00], outliers=27
+
+================================================================================
+TASK 7: Visualizations
+================================================================================
+Highest |correlation| pair: ('revenue', 'unit_price') = 0.650
+Saved 6 plot files to plots/
+
+================================================================================
+TASK 8a: Imputation strategy comparison (mean vs median)
+================================================================================
+quantity: mean=3.127, median=3.000
+revenue: mean=432.114, median=166.310
+
+Nulls remaining in target columns after chosen imputation:
+quantity    0
+revenue     0
+dtype: int64
+
+================================================================================
+TASK 8b: Spearman rank correlation vs Pearson
+================================================================================
+Pearson matrix:
+               customer_age  quantity  unit_price  discount_pct  revenue  rating  delivery_days  shipping_cost
+customer_age          1.000    -0.013      -0.003         0.026   -0.026   0.004         -0.011         -0.000
+quantity             -0.013     1.000      -0.009         0.010    0.120   0.033         -0.009         -0.019
+unit_price           -0.003    -0.009       1.000         0.005    0.650  -0.017          0.034          0.495
+discount_pct          0.026     0.010       0.005         1.000   -0.113  -0.000         -0.026         -0.009
+revenue              -0.026     0.120       0.650        -0.113    1.000   0.010          0.011          0.343
+rating                0.004     0.033      -0.017        -0.000    0.010   1.000          0.016         -0.042
+delivery_days        -0.011    -0.009       0.034        -0.026    0.011   0.016          1.000         -0.020
+shipping_cost        -0.000    -0.019       0.495        -0.009    0.343  -0.042         -0.020          1.000
+
+Spearman matrix:
+               customer_age  quantity  unit_price  discount_pct  revenue  rating  delivery_days  shipping_cost
+customer_age          1.000    -0.019      -0.003         0.031   -0.009  -0.004         -0.000          0.004
+quantity             -0.019     1.000      -0.019        -0.032    0.332   0.034         -0.037         -0.005
+unit_price           -0.003    -0.019       1.000         0.014    0.883  -0.023          0.028          0.388
+discount_pct          0.031    -0.032       0.014         1.000   -0.087  -0.021         -0.023         -0.018
+revenue              -0.009     0.332       0.883        -0.087    1.000  -0.009          0.024          0.345
+rating               -0.004     0.034      -0.023        -0.021   -0.009   1.000         -0.002         -0.038
+delivery_days        -0.000    -0.037       0.028        -0.023    0.024  -0.002          1.000         -0.008
+shipping_cost         0.004    -0.005       0.388        -0.018    0.345  -0.038         -0.008          1.000
+
+Top 3 pairs by |Spearman - Pearson|:
+                          pair  pearson  spearman  abs_diff
+0        revenue vs unit_price    0.650     0.883     0.232
+1          revenue vs quantity    0.120     0.332     0.212
+2  shipping_cost vs unit_price    0.495     0.388     0.107
+
+================================================================================
+TASK 8c: Grouped aggregation
+================================================================================
+               mean         std  count
+region                                
+Central  417.188792  628.455121    235
+East     425.225432  602.910849    442
+North    422.793535  902.530830    453
+South    430.722442  733.899241    446
+West     404.659660  737.016901    424
+
+Highest mean group: South (430.72)
+Highest std group: North (902.53)
+Ratio highest-mean/lowest-mean: 1.064
+
+================================================================================
+TASK 9: Save cleaned dataset
+================================================================================
+Saved cleaned_data.csv, shape: (2000, 13)
+
+Final null check:
+order_id              0
+order_date            0
+customer_segment      0
+region                0
+product_category      0
+customer_age          0
+quantity              0
+unit_price            0
+discount_pct          0
+revenue               0
+rating                0
+delivery_days         0
+shipping_cost       582
+dtype: int64
+
+================================================================================
+DONE
+================================================================================
